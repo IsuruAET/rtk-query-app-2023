@@ -14,7 +14,12 @@ import AddCircleOutlineRounded from "@mui/icons-material/AddCircleOutlineRounded
 import DeleteRounded from "@mui/icons-material/DeleteRounded";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-// Should import our queries and mutations
+import {
+  useGetTodosQuery,
+  useUpdateTodoMutation,
+  useDeleteTodoMutation,
+  useAddTodoMutation,
+} from "./toDosApiSlice";
 
 const ToDoList = () => {
   const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -22,26 +27,21 @@ const ToDoList = () => {
 
   const [newToDo, setNewToDo] = React.useState("");
 
-  // To Do - These all states should get from useGetTodosQuery hook
-  const todos = [
-    {
-      id: 1,
-      title: "ToDo 1",
-      completed: false,
-    },
-  ];
-  const isLoading = false;
-  const isFetching = false;
-  const isSuccess = true;
-  const isError = false;
-  const error = null;
-  // To Do - These all states should get from useGetTodosQuery hook
-
-  // Initialize ToDos actions
+  const {
+    data: todos,
+    isLoading,
+    isFetching,
+    isSuccess,
+    isError,
+    error,
+  } = useGetTodosQuery();
+  const [addTodo] = useAddTodoMutation();
+  const [updateTodo] = useUpdateTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add new ToDo action
+    addTodo({ title: newToDo, completed: false });
     setNewToDo("");
   };
 
@@ -59,14 +59,16 @@ const ToDoList = () => {
               checkedIcon={checkedIcon}
               sx={{ marginRight: 4 }}
               checked={todo.completed}
-              onChange={() => {}} // Update complete status action
+              onChange={() =>
+                updateTodo({ ...todo, completed: !todo.completed })
+              } // Update complete status action
             />
             <ListItemText primary={todo.title} />
 
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
-                onClick={() => {}} // Delete ToDo action
+                onClick={() => deleteTodo({ id: todo.id })} // Delete ToDo action
               >
                 <DeleteRounded />
               </IconButton>
